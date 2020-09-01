@@ -4,23 +4,37 @@ from airflow.utils.decorators import apply_defaults
 
 class StageToRedshiftOperator(BaseOperator):
     ui_color = '#358140'
+    
+    DROP_SQL = "DELETE FROM {}"
 
+    COPY_SQL = """
+        COPY {}
+        FROM 's3://udacity-dend/{}'
+        ACCESS_KEY_ID '{{}}'
+        SECRET_ACCESS_KEY '{{}}'
+        FORMAT AS JSON 'auto'
+        region 'us-west-2'
+    """
+    
     @apply_defaults
-    def __init__(self,
-                 # Define your operators params (with defaults) here
-                 # Example:
-                 # redshift_conn_id=your-connection-name
+    def __init__(self, table, awsConn, redshiftConn, s3Path,
                  *args, **kwargs):
 
         super(StageToRedshiftOperator, self).__init__(*args, **kwargs)
-        # Map params here
-        # Example:
-        # self.conn_id = conn_id
+        self.table = table
+        self.aws_conn_id = awsConn
+        self.redshift_conn_id = redshiftConn
+        self.s3_path = s3Path
+        self.drop_query = StageToRedshiftOperator.DROP_SQL.format(table)
+        self.copy_query = StageToRedshiftOperator.COPY_SQL.format(
+            table, s3Path) 
 
     def execute(self, context):
-        self.log.info('StageToRedshiftOperator not implemented yet')
-
-
-
-
-
+        aws = AwsHook(self.aws_conn_id)
+        aws_credentials = aws.get_credentials()
+        redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
+        self.log.info(self.drop_query)
+        redshift.run(self.drop_query)
+        self.log.info(self.copy_query)
+        redshift.run(self.copy_query.format(aws_credentials.access_key,
+                                           aws_credentials.secret_key))

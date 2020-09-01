@@ -29,12 +29,20 @@ start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
 
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
-    dag=dag
+    dag=dag,
+    table='staging_events',
+    awsConn='aws_credentials',
+    redshiftConn='redshift',
+    s3Path='log_data/*/*/*.json'
 )
 
 stage_songs_to_redshift = StageToRedshiftOperator(
     task_id='Stage_songs',
-    dag=dag
+    dag=dag,
+    table='staging_songs',
+    awsConn='aws_credentials',
+    redshiftConn='redshift',
+    s3Path='song_data/*/*/*/*.json'
 )
 
 load_songplays_table = LoadFactOperator(
@@ -68,3 +76,11 @@ run_quality_checks = DataQualityOperator(
 )
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
+
+start_operator >> [stage_events_to_redshift, stage_songs_to_redshift]
+[stage_events_to_redshift, stage_songs_to_redshift] >> load_songplays_table
+load_songplays_table >> [load_song_dimension_table, load_artist_dimension_table,
+                         load_time_dimension_table, load_user_dimension_table ]
+[load_song_dimension_table, load_artist_dimension_table,
+    load_time_dimension_table, load_user_dimension_table ] >> run_quality_checks
+run_quality_checks >> end_operator
