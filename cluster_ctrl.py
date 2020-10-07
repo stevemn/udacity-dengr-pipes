@@ -1,4 +1,5 @@
 import sys
+import time
 import json
 import boto3
 import configparser
@@ -33,14 +34,23 @@ def cluster_shutdown(session, clusterId):
         resp['Cluster']['ClusterStatus']))
     return client
 
-def update_airflow_configuration(client, config):
+def get_cluster(client, config):
     resp = client.describe_clusters()
-    print(resp)
     clusters = [ c for c in resp['Clusters']
         if c['ClusterIdentifier'] == config['AWS']['CLUSTER_ID'] ]
     assert len(clusters) == 1
-    cluster = clusters[0]
-    print(cluster)
+    return clusters[0]
+
+def cluster_is_creating(cluster):
+    return cluster['ClusterStatus'] == 'creating'
+
+def update_airflow_configuration(client, config):
+    cluster = get_cluster(client, config)
+    while cluster_is_creating(cluster):
+        print('Waiting on cluster creation')
+        time.sleep(15)
+        cluster = get_cluster(client, config)
+    print('Cluster active')
     config['AF_CONN_REDSHIFT']['HOST'] = cluster['Endpoint']['Address']
     config['AF_CONN_REDSHIFT']['PORT'] = str(
         cluster['Endpoint']['Port'])
