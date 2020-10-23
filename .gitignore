@@ -2,3 +2,4 @@
 *.cfg
 .ipynb_checkpoints/
 pipeline.ini
+steve_af.sh

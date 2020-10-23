@@ -44,13 +44,19 @@ def get_cluster(client, config):
 def cluster_is_creating(cluster):
     return cluster['ClusterStatus'] == 'creating'
 
+def sleep_and_print(sleepTime):
+    print('Cluster creating...')
+    for i in range(sleepTime,0,-1):
+        sys.stdout.write(f'\rChecking cluster status in: {i:2d}')
+        sys.stdout.flush()
+        time.sleep(1)
+
 def update_airflow_configuration(client, config):
     cluster = get_cluster(client, config)
     while cluster_is_creating(cluster):
-        print('Waiting on cluster creation')
-        time.sleep(15)
+        sleep_and_print(20)
         cluster = get_cluster(client, config)
-    print('Cluster active')
+    print('Cluster available')
     config['AF_CONN_REDSHIFT']['HOST'] = cluster['Endpoint']['Address']
     config['AF_CONN_REDSHIFT']['PORT'] = str(
         cluster['Endpoint']['Port'])
@@ -93,3 +99,7 @@ if __name__ == '__main__':
     elif action == 'stop':
         client = cluster_shutdown(session, cluster_id)
         print('Cluster deactivated')
+
+    elif action == 'test':
+        sleep_and_print(10)
+        sleep_and_print(5)
