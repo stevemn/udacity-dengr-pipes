@@ -1,13 +1,14 @@
 from datetime import datetime, timedelta
 import os
 from airflow import DAG
+from airflow.
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators import (StageToRedshiftOperator, LoadFactOperator,
                                 LoadDimensionOperator, DataQualityOperator)
 from helpers import SqlQueries
 
-AWS_KEY = os.environ.get('AWS_KEY')
-AWS_SECRET = os.environ.get('AWS_SECRET')
+# AWS_KEY = os.environ.get('AWS_KEY')
+# AWS_SECRET = os.environ.get('AWS_SECRET')
 
 default_args = {
     'owner': 'udacity',
@@ -26,6 +27,10 @@ dag = DAG('sparkify_dag',
         )
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
+
+create_tables = PostgresOperator(
+
+)
 
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
@@ -47,7 +52,11 @@ stage_songs_to_redshift = StageToRedshiftOperator(
 
 load_songplays_table = LoadFactOperator(
     task_id='Load_songplays_fact_table',
-    dag=dag
+    dag=dag,
+    redshiftConn='redshift',
+    table='songplays',
+    columns=[],
+    insertSelect=SqlQueries.songplay_table_insert
 )
 
 load_user_dimension_table = LoadDimensionOperator(
