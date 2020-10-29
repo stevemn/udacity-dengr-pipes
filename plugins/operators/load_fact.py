@@ -14,15 +14,13 @@ class LoadFactOperator(BaseOperator):
     """
 
     @apply_defaults
-    def __init__(self, awsConn, redshiftConn, table, insertSelect,
-        *args, **kwargs):
+    def __init__(self, redshiftConn, table, insertSelect, *args, **kwargs):
 
         super(LoadFactOperator, self).__init__(*args, **kwargs)
         # Map params here
         # Example:
         # self.conn_id = conn_id
         self.table = table
-        self.aws_conn_id = awsConn
         self.redshift_conn_id = redshiftConn
         self.drop_query = LoadFactOperator.DROP_SQL.format(table)
         self.insert_query = LoadFactOperator.INSERT_SQL.format(
