@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 import os
 from airflow import DAG
-from airflow.
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators import (StageToRedshiftOperator, LoadFactOperator,
                                 LoadDimensionOperator, DataQualityOperator)
 from helpers import SqlQueries
@@ -13,6 +13,7 @@ from helpers import SqlQueries
 default_args = {
     'owner': 'udacity',
     'start_date': datetime(2019, 1, 12),
+    'max_active_runs': 1,
     'depends_on_past': False,
     'retries': 3,
     'retry_delay': timedelta(minutes=5),
@@ -23,7 +24,7 @@ default_args = {
 dag = DAG('sparkify_dag',
           default_args=default_args,
           description='Load and transform data in Redshift with Airflow',
-          schedule_interval='0 * * * *'
+          schedule_interval=None
         )
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
