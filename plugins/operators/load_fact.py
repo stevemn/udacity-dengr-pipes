@@ -10,7 +10,7 @@ class LoadFactOperator(BaseOperator):
 
     INSERT_SQL = """
         INSERT INTO public.{}
-        ({})
+        {}
     """
 
     @apply_defaults

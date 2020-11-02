@@ -13,12 +13,12 @@ class StageToRedshiftOperator(BaseOperator):
         FROM 's3://udacity-dend/{}'
         ACCESS_KEY_ID '{{}}'
         SECRET_ACCESS_KEY '{{}}'
-        FORMAT AS JSON 'auto'
+        FORMAT AS JSON '{}'
         region 'us-west-2'
     """
     
     @apply_defaults
-    def __init__(self, table, awsConn, redshiftConn, s3Path,
+    def __init__(self, table, awsConn, redshiftConn, s3Path, jsonFormat='auto',
                  *args, **kwargs):
 
         super(StageToRedshiftOperator, self).__init__(*args, **kwargs)
@@ -26,9 +26,10 @@ class StageToRedshiftOperator(BaseOperator):
         self.aws_conn_id = awsConn
         self.redshift_conn_id = redshiftConn
         self.s3_path = s3Path
+        self.json_format = jsonFormat
         self.drop_query = StageToRedshiftOperator.DROP_SQL.format(table)
         self.copy_query = StageToRedshiftOperator.COPY_SQL.format(
-            table, s3Path) 
+            table, s3Path, jsonFormat)
 
     def execute(self, context):
         aws = AwsHook(self.aws_conn_id)
