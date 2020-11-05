@@ -6,7 +6,8 @@ class SqlQueries:
             name varchar(256),
             location varchar(256),
             lattitude numeric(18,0),
-            longitude numeric(18,0)
+            longitude numeric(18,0),
+            CONSTRAINT artist_pkey PRIMARY KEY (artistid)
         );
 
         CREATE TABLE public.songplays (
@@ -72,6 +73,17 @@ class SqlQueries:
             gender varchar(256),
             "level" varchar(256),
             CONSTRAINT users_pkey PRIMARY KEY (userid)
+        );
+
+        CREATE TABLE public.time (
+            start_time timestamp NOT NULL,
+            hour int4,
+            day int4,
+            week int4,
+            month varchar(20),
+            "year" int4,
+            weekday varchar(20),
+            CONSTRAINT time_pkey PRIMARY KEY (start_time)
         );
     """)
 

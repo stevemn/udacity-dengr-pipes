@@ -14,7 +14,7 @@ class LoadFactOperator(BaseOperator):
     """
 
     @apply_defaults
-    def __init__(self, redshiftConn, table, insertSelect, *args, **kwargs):
+    def __init__(self, redshiftConn, table, query, *args, **kwargs):
 
         super(LoadFactOperator, self).__init__(*args, **kwargs)
         # Map params here
@@ -24,7 +24,7 @@ class LoadFactOperator(BaseOperator):
         self.redshift_conn_id = redshiftConn
         self.drop_query = LoadFactOperator.DROP_SQL.format(table)
         self.insert_query = LoadFactOperator.INSERT_SQL.format(
-            table, insertSelect)
+            table, query)
 
     def execute(self, context):
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
