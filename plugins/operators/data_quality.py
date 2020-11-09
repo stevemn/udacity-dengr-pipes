@@ -7,7 +7,7 @@ class DataQualityOperator(BaseOperator):
     ui_color = '#89DA59'
 
     CHECK_SQL = '''
-        "SELECT COUNT(*) FROM public.{}"
+        SELECT COUNT(*) FROM public.{}
     '''
 
     @apply_defaults
