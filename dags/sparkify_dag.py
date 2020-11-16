@@ -91,11 +91,11 @@ run_quality_checks = DataQualityOperator(
     dag=dag,
     redshiftConn='redshift',
     qualityChecks=[
-        {'check_sql': 'SELECT COUNT(*) FROM public.artists', 'expected_result': 0},
-        {'check_sql': 'SELECT COUNT(*) FROM public.songplays', 'expected_result': 0},
-        {'check_sql': 'SELECT COUNT(*) FROM public.songs', 'expected_result': 0},
-        {'check_sql': 'SELECT COUNT(*) FROM public.time', 'expected_result': 0},
-        {'check_sql': 'SELECT COUNT(*) FROM public.users', 'expected_result': 0}
+        {'check_sql': 'SELECT COUNT(*) FROM public.artists', 'expected_result': 24},
+        {'check_sql': 'SELECT COUNT(*) FROM public.songplays', 'expected_result': 6820},
+        {'check_sql': 'SELECT COUNT(*) FROM public.songs', 'expected_result': 24},
+        {'check_sql': 'SELECT COUNT(*) FROM public.time', 'expected_result': 6820},
+        {'check_sql': 'SELECT COUNT(*) FROM public.users', 'expected_result': 104}
     ]
 )
 
